@@ -44,7 +44,7 @@ Table of Contents
 
 1.  **Clone the Repository:** 
     - `git clone https://github.com/itsmedeepak/noteapp.git` 
-    - `cd note-taking-app`
+    - `cd noteapp`
 2.  **Install Dependencies:** 
       - `npm install`
 3.  **Configure Enviromental Variables:**
