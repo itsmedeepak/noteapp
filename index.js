@@ -1,12 +1,12 @@
 // index.js
 const express = require('express');
+const dotenv = require('dotenv')
 const bodyParser = require('body-parser');
 const connectDB = require('./config/db');
 const authRoutes = require('./routes/authRoutes');
 const noteRoutes = require('./routes/noteRoutes');
 const searchRoutes = require('./routes/searchRoutes');
 const rateLimitMiddleware = require('./middleware/rateLimitMiddleware');
-
 
 const PORT = process.env.PORT || 3000;
 
@@ -17,6 +17,8 @@ app.use(bodyParser.json());
 
 // Apply rate limiting globally
 app.use(rateLimitMiddleware);
+
+dotenv.config();
 
 // Connect to MongoDB
 connectDB();

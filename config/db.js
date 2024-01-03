@@ -3,7 +3,7 @@ const mongoose = require('mongoose');
 
 const connectDB = async () => {
   try {
-    const MONGODB_URI = 'mongodb://localhost:27017/noteApp';
+    const MONGODB_URI = process.env.MONGODBURI;
     await mongoose.connect(MONGODB_URI, {
       useNewUrlParser: true,
       useUnifiedTopology: true,
