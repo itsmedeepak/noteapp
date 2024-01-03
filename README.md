@@ -17,42 +17,21 @@ Table of Contents
 *   [Authentication](#authentication)
 *   [Rate Limiting and Request Throttling](#rate-limiting-and-request-throttling)
 *   [Search Functionality](#search-functionality)
-*   [Testing](#testing)
 *   [Folder Structure](#folder-structure)
 *   [Dependencies](#dependencies)
-*   [Contributing](#contributing)
-*   [License](#license)
 
-Project Structure
------------------
+[Folder Structure](#project-structure)
+----------------
 
-note-taking-app/
-|-- controllers/
-|   |-- noteController.js
-|   |-- authController.js
-|-- middleware/
-|   |-- authenticationMiddleware.js
-|   |-- rateLimitingMiddleware.js
-|-- models/
-|   |-- Note.js
-|   |-- User.js
-|-- routes/
-|   |-- authRoutes.js
-|   |-- noteRoutes.js
-|   |-- searchRoutes.js
-|-- test/
-|   |-- noteController.test.js
-|   |-- authController.test.js
-|-- config/
-|   |-- db.js
-|-- index.js
-|-- README.md
-|-- package.json
-|-- .gitignore
-|-- package-lock.json
-    
+*   **controllers/:** Contains controller functions handling logic.
+*   **middleware/:** Includes authentication middleware and rate limiting middleware.
+*   **models/:** Defines the Mongoose models for MongoDB.
+*   **routes/:** Defines the API routes and their corresponding controllers.
+*   **test/:** Holds the test files for unit and integration tests.
+*   **config/:** Includes configuration files such as database connection.
 
-Technical Stack
+
+[Technical Stack](#technical-stack)
 ---------------
 
 *   **Framework:** Express.js
@@ -60,17 +39,20 @@ Technical Stack
 *   **Authentication:** JSON Web Tokens (JWT)
 *   **Testing:** Your preferred testing framework
 
-Getting Started
+[Getting Started](#getting-started)
 ---------------
 
-1.  **Clone the Repository:** `git clone <repository-url>` `cd note-taking-app`
-2.  **Install Dependencies:** `npm install`
-3.  **Configure Database:**
-    *   Set up a MongoDB database and update the connection details in `config/db.js`.
+1.  **Clone the Repository:** 
+    - `git clone https://github.com/itsmedeepak/noteapp.git` 
+    - `cd note-taking-app`
+2.  **Install Dependencies:** 
+      - `npm install`
+3.  **Configure Enviromental Variables:**
+    -  `MONGODBURI = <replace with mongodb uri string>`
+     -  `SECRETKEY = <replace with jwt scecret key>`
 4.  **Run the Application:** `npm start`
-5.  **Run Tests:** `npm test`
 
-API Endpoints
+[API Endpoints](#api-endpoints)
 -------------
 
 ### Authentication Endpoints
@@ -88,51 +70,90 @@ API Endpoints
 *   `POST /api/notes/:id/share:` Share a note with another user for the authenticated user.
 *   `GET /api/search?q=:query:` Search for notes based on keywords.
 
-Authentication
+[Authentication](#authentication)
 --------------
 
 The API uses JSON Web Tokens (JWT) for authentication. Include the token in the Authorization header when making requests to secured endpoints.
 
-Rate Limiting and Request Throttling
+```
+const authenticationMiddleware = async (req, res, next) => {
+  try {
+    // Extract the token from the Authorization header
+    const token = req.headers.authorization.split(' ')[1];
+
+    // Verify the token
+    const decodedToken = jwt.verify(token, process.env.SECRETKEY); // Use your actual secret key
+
+    // Check if the user exists
+    const user = await User.findById(decodedToken.userId);
+    
+    if (!user) {
+      return res.status(401).json({ error: 'Unauthorized' });
+    }
+
+    // Attach the user to the request object for further use
+    req.user = user;
+    next();
+  } catch (error) {
+    return res.status(401).json({ error: 'Unauthorized' });
+  }
+};
+```
+
+[Rate Limiting and Request Throttling](#rate-limiting-and-request-throttling)
 ------------------------------------
 
 To handle high traffic, rate limiting and request throttling have been implemented, ensuring the API remains performant and secure.
 
-Search Functionality
+```java
+const rateLimit = require('express-rate-limit');
+
+// Create a limiter with specified options
+const limiter = rateLimit({
+  windowMs: 15 * 60 * 1000, // 15 minutes
+  max: 100, // maximum requests per window
+  message: 'Too many requests from this IP, please try again later.',
+});
+
+module.exports = limiter;
+```
+
+[Search Functionality](#search-functionality)
 --------------------
 
 Text indexing is implemented for high-performance search functionality. Users can search for notes based on keywords.
 
-Testing
--------
+```
+const searchNotes = async (req, res) => {
+  try {
+    const query = req.query.q;
+    const notes = await Note.find({
+      $or: [
+        { title: { $regex: query, $options: 'i' } }, // Case-insensitive title search
+        { content: { $regex: query, $options: 'i' } }, // Case-insensitive content search
+      ],
+    });
 
-The project includes unit tests and integration tests for all API endpoints. To run the tests, use:
+    res.json(notes);
+  } catch (error) {
+    res.status(500).json({ error: 'Internal Server Error' });
+  }
+};
+```
 
-`npm test`
 
-Folder Structure
-----------------
-
-*   **controllers/:** Contains controller functions handling business logic.
-*   **middleware/:** Includes authentication middleware and other custom middleware.
-*   **models/:** Defines the Mongoose models for MongoDB.
-*   **routes/:** Defines the API routes and their corresponding controllers.
-*   **test/:** Holds the test files for unit and integration tests.
-*   **config/:** Includes configuration files such as database connection.
-
-Dependencies
+[Dependencies](#dependencies)
 ------------
 
 Ensure you have the required dependencies installed:
+- **bcrypt**: "^5.1.1"
+- **body-parser**: "^1.20.2"
+- **cors**: "^2.8.5"
+- **dotenv**: "^16.3.1"
+- **express**: "^4.18.2"
+- **express-rate-limit**: "^7.1.5"
+- **jsonwebtoken**: "^9.0.2"
+- **mongoose**: "^8.0.3"
+- **nodemon**: "^3.0.2"
 
-`npm install`
-
-Contributing
-------------
-
-If you want to contribute to this project, please follow the guidelines in the [CONTRIBUTING.md](CONTRIBUTING.md) file.
-
-License
--------
-
-This project is licensed under the [MIT License](LICENSE.md) - see the [LICENSE.md](LICENSE.md) file for details.
+Developed by Deepak Kumar ❤️
