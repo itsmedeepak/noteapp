@@ -75,7 +75,7 @@ Table of Contents
 
 The API uses JSON Web Tokens (JWT) for authentication. Include the token in the Authorization header when making requests to secured endpoints.
 
-```
+```javascript
 const authenticationMiddleware = async (req, res, next) => {
   try {
     // Extract the token from the Authorization header
@@ -105,7 +105,7 @@ const authenticationMiddleware = async (req, res, next) => {
 
 To handle high traffic, rate limiting and request throttling have been implemented, ensuring the API remains performant and secure.
 
-```java
+```javascript
 const rateLimit = require('express-rate-limit');
 
 // Create a limiter with specified options
@@ -123,7 +123,7 @@ module.exports = limiter;
 
 Text indexing is implemented for high-performance search functionality. Users can search for notes based on keywords.
 
-```
+```javascript
 const searchNotes = async (req, res) => {
   try {
     const query = req.query.q;
